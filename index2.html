@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM+XR Superpowers & Risks — Research Review</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:          #06080f;
+            --bg-card:     #0d1117;
+            --bg-hover:    #131a24;
+            --border:      #1e2535;
+            --border-hi:   #2d3748;
+            --text:        #e2e8f0;
+            --muted:       #94a3b8;
+            --dim:         #64748b;
+            --accent:      #6366f1;
+            --accent-glow: rgba(99,102,241,.15);
+            --green:       #10b981;
+            --green-bg:    rgba(16,185,129,.1);
+            --blue:        #3b82f6;
+            --blue-bg:     rgba(59,130,246,.1);
+            --purple:      #a855f7;
+            --purple-bg:   rgba(168,85,247,.1);
+            --orange:      #f59e0b;
+            --orange-bg:   rgba(245,158,11,.1);
+            --red:         #ef4444;
+            --red-bg:      rgba(239,68,68,.1);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ── NAV ─────────────────────────────────────────────── */
+        .topnav {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(6,8,15,.88);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border);
+            height: 56px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 2rem;
+        }
+        .nav-brand {
+            font-size: .9rem; font-weight: 800;
+            letter-spacing: .06em; text-transform: lowercase;
+            color: #fff; text-decoration: none;
+        }
+        .nav-brand em { font-style: normal; color: var(--accent); }
+        .nav-links { display: flex; gap: .15rem; list-style: none; }
+        .nav-links a {
+            color: var(--muted); text-decoration: none;
+            font-size: .82rem; font-weight: 500;
+            padding: .38rem .7rem; border-radius: 6px;
+            transition: color .12s, background .12s;
+        }
+        .nav-links a:hover { color: var(--text); background: rgba(255,255,255,.05); }
+
+        /* ── HERO ────────────────────────────────────────────── */
+        .hero {
+            max-width: 720px; margin: 0 auto;
+            padding: 5rem 2rem 3rem; text-align: center;
+        }
+        .hero-eyebrow {
+            font-size: .7rem; font-weight: 700;
+            letter-spacing: .14em; text-transform: uppercase;
+            color: var(--accent); margin-bottom: 1.2rem;
+        }
+        .hero h1 {
+            font-size: clamp(2rem, 5.5vw, 3.4rem);
+            font-weight: 900; line-height: 1.13; color: #fff;
+            margin-bottom: 1.1rem;
+        }
+        .hero-word {
+            background: linear-gradient(130deg, var(--green) 0%, var(--blue) 50%, var(--purple) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-desc {
+            font-size: .95rem; color: var(--muted);
+            max-width: 520px; margin: 0 auto 2rem;
+            line-height: 1.8;
+        }
+        .hero-btns { display: flex; gap: .7rem; justify-content: center; }
+
+        .btn-primary {
+            background: var(--accent); color: #fff;
+            padding: .58rem 1.3rem; border-radius: 8px;
+            font-size: .82rem; font-weight: 700;
+            text-decoration: none; border: none; cursor: pointer;
+            transition: opacity .13s;
+        }
+        .btn-primary:hover { opacity: .82; }
+
+        .btn-outline {
+            background: transparent; color: var(--muted);
+            padding: .58rem 1.3rem; border-radius: 8px;
+            font-size: .82rem; font-weight: 600;
+            text-decoration: none; cursor: pointer;
+            border: 1px solid var(--border-hi);
+            transition: color .13s, border-color .13s;
+        }
+        .btn-outline:hover { color: var(--text); border-color: #4a5568; }
+
+        /* ── STATS BAR ───────────────────────────────────────── */
+        .stats-row {
+            display: flex; gap: 2px; justify-content: center;
+            max-width: 680px; margin: 0 auto 1.5rem; padding: 0 2rem;
+        }
+        .stat-chip {
+            flex: 1; background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: .9rem 1.25rem; text-align: center;
+        }
+        .stat-chip:first-child  { border-radius: 10px 3px 3px 10px; }
+        .stat-chip:last-child   { border-radius: 3px 10px 10px 3px; }
+        .stat-chip .snum {
+            display: block; font-size: 1.8rem;
+            font-weight: 900; color: #fff;
+        }
+        .stat-chip .slbl {
+            display: block; font-size: .7rem;
+            color: var(--dim); margin-top: .15rem;
+        }
+
+        /* ── SECTION SHELL ───────────────────────────────────── */
+        .sep { border: none; border-top: 1px solid var(--border); max-width: 1100px; margin: 0 auto; }
+
+        .section { max-width: 1100px; margin: 0 auto; padding: 3.5rem 2rem; }
+
+        .sec-hdr { display: flex; align-items: baseline; gap: .8rem; margin-bottom: .4rem; }
+        .sec-title { font-size: 1.45rem; font-weight: 700; color: #fff; }
+        .ver-tag {
+            font-size: .66rem; font-weight: 700;
+            background: var(--accent-glow); color: var(--accent);
+            border: 1px solid rgba(99,102,241,.3);
+            padding: .18rem .45rem; border-radius: 4px;
+            letter-spacing: .05em;
+        }
+        .sec-meta { font-size: .76rem; color: var(--dim); margin-bottom: 1.2rem; }
+        .sec-divider { border: none; border-top: 1px solid var(--border); margin-bottom: 1.5rem; }
+
+        /* ── INTRO BLOCK ─────────────────────────────────────── */
+        .intro-block {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 1.6rem;
+        }
+        .intro-block p { font-size: .88rem; color: var(--muted); line-height: 1.8; }
+        .intro-block p + p { margin-top: .8rem; }
+
+        /* ── LEADERBOARD TABLE ───────────────────────────────── */
+        .lb { width: 100%; border-collapse: collapse; }
+        .lb thead th {
+            font-size: .68rem; font-weight: 700;
+            color: var(--dim); text-transform: uppercase;
+            letter-spacing: .07em; padding: .55rem .9rem;
+            text-align: left; border-bottom: 1px solid var(--border);
+        }
+        .lb tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
+        .lb tbody tr:hover { background: var(--bg-hover); }
+        .lb tbody td { padding: .85rem .9rem; vertical-align: middle; }
+
+        .rk { font-size: .75rem; font-weight: 600; color: var(--dim); width: 2.2rem; }
+
+        .cat-icon {
+            width: 34px; height: 34px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
+        }
+        .ic-green  { background: var(--green-bg); }
+        .ic-blue   { background: var(--blue-bg); }
+        .ic-purple { background: var(--purple-bg); }
+        .ic-orange { background: var(--orange-bg); }
+        .ic-red    { background: var(--red-bg); }
+
+        .cell-name  { font-size: .875rem; font-weight: 600; color: #fff; }
+        .cell-sub   { font-size: .72rem; color: var(--dim); margin-top: .12rem; }
+        .cell-tags  { font-size: .72rem; color: var(--muted); line-height: 1.7; }
+
+        .score-wrap { min-width: 170px; }
+        .score-inner { display: flex; align-items: center; gap: .65rem; }
+        .score-num  { font-size: .82rem; font-weight: 700; color: #fff; min-width: 2.6rem; text-align: right; }
+        .bar-bg { flex: 1; height: 6px; background: rgba(255,255,255,.06); border-radius: 3px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 3px; transition: width .5s ease; }
+        .bar-green  { background: var(--green); }
+        .bar-blue   { background: var(--blue); }
+        .bar-purple { background: var(--purple); }
+        .bar-orange { background: var(--orange); }
+        .bar-red    { background: var(--red); }
+        .score-pct  { font-size: .68rem; color: var(--dim); margin-top: .22rem; }
+
+        .lb-foot { font-size: .7rem; color: var(--dim); margin-top: .9rem; text-align: right; }
+
+        /* ── BADGES ──────────────────────────────────────────── */
+        .bdg {
+            display: inline-block; font-size: .66rem; font-weight: 700;
+            padding: .17rem .45rem; border-radius: 4px;
+            letter-spacing: .04em; white-space: nowrap; vertical-align: middle;
+        }
+        .bdg-xr  { background: var(--blue-bg);   color: var(--blue);   border: 1px solid rgba(59,130,246,.2); }
+        .bdg-int { background: var(--green-bg);   color: var(--green);  border: 1px solid rgba(16,185,129,.2); }
+        .bdg-ext { background: var(--blue-bg);    color: var(--blue);   border: 1px solid rgba(59,130,246,.2); }
+        .bdg-mnd { background: var(--purple-bg);  color: var(--purple); border: 1px solid rgba(168,85,247,.2); }
+        .bdg-pop { background: rgba(255,255,255,.05); color: var(--muted); border: 1px solid var(--border); }
+
+        /* ── LITERATURE TABLE ────────────────────────────────── */
+        .lit-controls {
+            display: flex; flex-wrap: wrap; gap: .65rem;
+            align-items: center; margin-bottom: 1.1rem;
+        }
+        .lit-search {
+            flex: 1; min-width: 210px;
+            background: var(--bg-card); border: 1px solid var(--border-hi);
+            color: var(--text); padding: .52rem .8rem;
+            border-radius: 8px; font-size: .82rem; font-family: 'Inter', sans-serif;
+            outline: none; transition: border-color .13s;
+        }
+        .lit-search:focus { border-color: var(--accent); }
+        .lit-search::placeholder { color: var(--dim); }
+
+        .lit-sel {
+            background: var(--bg-card); border: 1px solid var(--border-hi);
+            color: var(--text); padding: .52rem 2rem .52rem .8rem;
+            border-radius: 8px; font-size: .78rem; font-family: 'Inter', sans-serif;
+            outline: none; cursor: pointer; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%2364748b' d='M5 7L0 2h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right .55rem center;
+        }
+        .lit-sel:focus { border-color: var(--accent); }
+
+        .btn-rst {
+            background: transparent; border: 1px solid var(--border-hi);
+            color: var(--muted); padding: .52rem .95rem;
+            border-radius: 8px; font-size: .78rem; font-family: 'Inter', sans-serif;
+            cursor: pointer; transition: color .13s, border-color .13s;
+        }
+        .btn-rst:hover { color: var(--text); border-color: #4a5568; }
+
+        .lit-count { font-size: .76rem; color: var(--dim); margin-bottom: .9rem; }
+        .lit-count strong { color: var(--muted); }
+
+        .lit-tbl { width: 100%; border-collapse: collapse; }
+        .lit-tbl thead th {
+            font-size: .66rem; font-weight: 700;
+            color: var(--dim); text-transform: uppercase;
+            letter-spacing: .07em; padding: .55rem .75rem;
+            text-align: left; border-bottom: 1px solid var(--border);
+        }
+        .lit-tbl tbody tr.paper-row {
+            border-bottom: 1px solid var(--border);
+            cursor: pointer; transition: background .1s;
+        }
+        .lit-tbl tbody tr.paper-row:hover { background: var(--bg-hover); }
+        .lit-tbl tbody tr.paper-row.hidden { display: none; }
+        .lit-tbl tbody tr.expand-row { display: none; background: var(--bg-card); }
+        .lit-tbl tbody tr.expand-row.open { display: table-row; }
+
+        .lit-tbl tbody td { padding: .7rem .75rem; vertical-align: top; font-size: .8rem; }
+
+        .ptitle { font-size: .8rem; font-weight: 500; color: var(--text); line-height: 1.4; }
+        .pauth  { font-size: .72rem; color: var(--dim); margin-top: .18rem; }
+
+        .expand-inner {
+            padding: .9rem 1rem 1.1rem;
+            border-left: 2px solid var(--accent);
+            margin-left: .75rem;
+        }
+        .exp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; }
+        .exp-field label {
+            font-size: .66rem; text-transform: uppercase;
+            letter-spacing: .08em; color: var(--dim);
+            display: block; margin-bottom: .25rem;
+        }
+        .exp-field p { font-size: .8rem; color: var(--muted); line-height: 1.55; }
+
+        .chev { font-size: .7rem; color: var(--dim); transition: transform .2s; display: inline-block; }
+        .chev.open { transform: rotate(90deg); }
+
+        /* ── INSIGHTS ────────────────────────────────────────── */
+        .insights-wrap {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1px; background: var(--border);
+            border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+        }
+        .ins-card {
+            background: var(--bg-card); padding: 1.45rem;
+            transition: background .13s;
+        }
+        .ins-card:hover { background: var(--bg-hover); }
+        .ins-card h3 { font-size: .85rem; font-weight: 700; color: #fff; margin-bottom: .55rem; }
+        .ins-card p  { font-size: .8rem; color: var(--muted); line-height: 1.7; }
+        .ins-card p strong { color: var(--text); }
+
+        /* ── FOOTER ──────────────────────────────────────────── */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 3rem 2rem; text-align: center;
+        }
+        .foot-inner { max-width: 460px; margin: 0 auto; }
+        .foot-title { font-size: .88rem; font-weight: 700; color: #fff; margin-bottom: .45rem; }
+        .foot-sub   { font-size: .78rem; color: var(--dim); line-height: 1.7; margin-bottom: 1.8rem; }
+        .foot-copy  { font-size: .72rem; color: var(--dim); margin-top: 1.5rem; }
+
+        /* ── RESPONSIVE ──────────────────────────────────────── */
+        @media (max-width: 640px) {
+            .nav-links { display: none; }
+            .stats-row { flex-wrap: wrap; }
+            .exp-grid  { grid-template-columns: 1fr; }
+            .hero h1   { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── Navigation ────────────────────────────────────────────── -->
+<nav class="topnav">
+    <a class="nav-brand" href="#">llm<em>+</em>xr</a>
+    <ul class="nav-links">
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#superpowers">Superpowers</a></li>
+        <li><a href="#risks">Risks</a></li>
+        <li><a href="#literature">Literature</a></li>
+        <li><a href="#insights">Insights</a></li>
+    </ul>
+</nav>
+
+<!-- ── Hero ──────────────────────────────────────────────────── -->
+<div class="hero">
+    <p class="hero-eyebrow">CHI 2026 · Literature Review</p>
+    <h1>The review for<br><span class="hero-word" id="hero-word">LLM‑Enabled XR</span></h1>
+    <p class="hero-desc">
+        With up-to-date analysis of 135 papers, mapping the superpowers
+        and risks of integrating large language models with extended reality.
+    </p>
+    <div class="hero-btns">
+        <a href="#superpowers" class="btn-primary">Explore Superpowers</a>
+        <a href="#literature"  class="btn-outline">Browse Papers</a>
+    </div>
+</div>
+
+<!-- ── Stats row ─────────────────────────────────────────────── -->
+<div class="stats-row">
+    <div class="stat-chip"><span class="snum">135</span><span class="slbl">Papers Analyzed</span></div>
+    <div class="stat-chip"><span class="snum">3</span><span class="slbl">Superpower Categories</span></div>
+    <div class="stat-chip"><span class="snum">7</span><span class="slbl">Risk Dimensions</span></div>
+    <div class="stat-chip"><span class="snum">100</span><span class="slbl">Papers w/ Behavioral Risks</span></div>
+</div>
+
+<!-- ── Overview ──────────────────────────────────────────────── -->
+<hr class="sep">
+<section id="overview" class="section">
+    <div class="sec-hdr">
+        <h2 class="sec-title">Overview</h2>
+        <span class="ver-tag">CHI 2026</span>
+    </div>
+    <p class="sec-meta">Comprehensive analysis of LLM × XR integration</p>
+    <hr class="sec-divider">
+    <div class="intro-block">
+        <p>The integration of generative AI with Extended Reality (XR) technologies has unlocked unprecedented capabilities, empowering users with enhanced cognitive, sensory, and environmental control—effectively enabling "superpowers" in immersive digital spaces.</p>
+        <p>This literature review examines both the transformative benefits and potential risks of LLM-enabled XR systems across healthcare, education, professional training, and beyond. By analyzing 135 papers, we identify three superpower categories and seven risk dimensions that characterize this rapidly evolving field.</p>
+    </div>
+</section>
+
+<!-- ── Superpowers leaderboard ────────────────────────────────── -->
+<hr class="sep">
+<section id="superpowers" class="section">
+    <div class="sec-hdr">
+        <h2 class="sec-title">Superpower Categories</h2>
+        <span class="ver-tag">V1.0</span>
+    </div>
+    <p class="sec-meta">Papers analyzed · 2020 — 2026 · ACM DL, IEEE Xplore &amp; related venues</p>
+    <hr class="sec-divider">
+
+    <table class="lb">
+        <thead>
+            <tr>
+                <th style="width:2.4rem">#</th>
+                <th style="width:2.8rem"></th>
+                <th>Category</th>
+                <th>Subcategories</th>
+                <th class="score-wrap">Coverage</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="rk">1</td>
+                <td><div class="cat-icon ic-blue">🌐</div></td>
+                <td>
+                    <div class="cell-name">External Superpowers</div>
+                    <div class="cell-sub">Environmental &amp; social manipulation</div>
+                </td>
+                <td class="cell-tags">
+                    Environment modification · Social elements<br>
+                    Object manipulation · 2D → 3D transformation · Cross-modal content
+                </td>
+                <td>
+                    <div class="score-inner">
+                        <span class="score-num">75</span>
+                        <div class="bar-bg"><div class="bar-fill bar-blue" style="width:55.6%"></div></div>
+                    </div>
+                    <div class="score-pct">55.6% of corpus</div>
+                </td>
+            </tr>
+            <tr>
+                <td class="rk">2</td>
+                <td><div class="cat-icon ic-green">🧠</div></td>
+                <td>
+                    <div class="cell-name">Internal Superpowers</div>
+                    <div class="cell-sub">Cognitive &amp; sensory enhancements</div>
+                </td>
+                <td class="cell-tags">
+                    Vision &amp; auditory augmentation · Cognitive load reduction<br>
+                    Memory augmentation · Reasoning · Psychological support
+                </td>
+                <td>
+                    <div class="score-inner">
+                        <span class="score-num">58</span>
+                        <div class="bar-bg"><div class="bar-fill bar-green" style="width:43%"></div></div>
+                    </div>
+                    <div class="score-pct">43.0% of corpus</div>
+                </td>
+            </tr>
+            <tr>
+                <td class="rk">3</td>
+                <td><div class="cat-icon ic-purple">👁️</div></td>
+                <td>
+                    <div class="cell-name">Mind Reading</div>
+                    <div class="cell-sub">Multimodal behavioral interpretation</div>
+                </td>
+                <td class="cell-tags">
+                    Eye gaze · Body gestures · Device input<br>
+                    Voice &amp; ambient audio · Facial expressions
+                </td>
+                <td>
+                    <div class="score-inner">
+                        <span class="score-num">21</span>
+                        <div class="bar-bg"><div class="bar-fill bar-purple" style="width:15.6%"></div></div>
+                    </div>
+                    <div class="score-pct">15.6% of corpus</div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <p class="lb-foot">Numbers may exceed 135 due to multi-category papers.</p>
+</section>
+
+<!-- ── Risks leaderboard ──────────────────────────────────────── -->
+<hr class="sep">
+<section id="risks" class="section">
+    <div class="sec-hdr">
+        <h2 class="sec-title">Risk Dimensions</h2>
+    </div>
+    <p class="sec-meta">Critical vulnerabilities in user autonomy, data security, and ethical transparency</p>
+    <hr class="sec-divider">
+
+    <table class="lb">
+        <thead>
+            <tr>
+                <th style="width:2.4rem">#</th>
+                <th style="width:2.8rem"></th>
+                <th>Risk Category</th>
+                <th>Key Concerns</th>
+                <th class="score-wrap">Prevalence</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="rk">1</td>
+                <td><div class="cat-icon ic-red">⚠️</div></td>
+                <td>
+                    <div class="cell-name">Manipulation of Thoughts &amp; Behavior</div>
+                    <div class="cell-sub">Most prevalent risk · 74% of corpus</div>
+                </td>
+                <td class="cell-tags">
+                    Behavioral data exploitation · Misinformation<br>
+                    Disinformation · Intent misinterpretation
+                </td>
+                <td>
+                    <div class="score-inner">
+                        <span class="score-num">100</span>
+                        <div class="bar-bg"><div class="bar-fill bar-red" style="width:74%"></div></div>
+                    </div>
+                    <div class="score-pct">74% of corpus</div>
+                </td>
+            </tr>
+            <tr>
+                <td class="rk">2</td>
+                <td><div class="cat-icon ic-orange">🔒</div></td>
+                <td>
+                    <div class="cell-name">User Data Awareness &amp; Transparency</div>
+                    <div class="cell-sub">Privacy &amp; informed consent</div>
+                </td>
+                <td class="cell-tags">
+                    Unawareness of data practices · Undervalued data sensitivity<br>
+                    Transparency in collection &amp; usage
+                </td>
+                <td>
+                    <div class="score-inner">
+                        <span class="score-num">60</span>
+                        <div class="bar-bg"><div class="bar-fill bar-orange" style="width:44.4%"></div></div>
+                    </div>
+                    <div class="score-pct">44.4% of corpus</div>
+                </td>
+            </tr>
+            <tr>
+                <td class="rk">3</td>
+                <td><div class="cat-icon ic-red">🛡️</div></td>
+                <td>
+                    <div class="cell-name">Cross-Reality Security Risks</div>
+                    <div class="cell-sub">Identity &amp; physical safety</div>
+                </td>
+                <td class="cell-tags">
+                    Identity theft &amp; impersonation · Cybersecurity threats<br>
+                    Physical safety (cybersickness) · IP &amp; content moderation
+                </td>
+                <td>
+                    <div class="score-inner">
+                        <span class="score-num">—</span>
+                        <div class="bar-bg"><div class="bar-fill bar-red" style="width:28%"></div></div>
+                    </div>
+                    <div class="score-pct">Multiple papers</div>
+                </td>
+            </tr>
+            <tr>
+                <td class="rk">4</td>
+                <td><div class="cat-icon ic-purple">🧩</div></td>
+                <td>
+                    <div class="cell-name">Self &amp; Social Risks</div>
+                    <div class="cell-sub">Identity &amp; interpersonal harm</div>
+                </td>
+                <td class="cell-tags">
+                    Cognitive &amp; sensory overload · Addiction &amp; overreliance<br>
+                    Cyberbullying · Skill atrophy · Cultural insensitivity
+                </td>
+                <td>
+                    <div class="score-inner">
+                        <span class="score-num">—</span>
+                        <div class="bar-bg"><div class="bar-fill bar-purple" style="width:20%"></div></div>
+                    </div>
+                    <div class="score-pct">Multiple papers</div>
+                </td>
+            </tr>
+            <tr>
+                <td class="rk">5</td>
+                <td><div class="cat-icon ic-orange">⚖️</div></td>
+                <td>
+                    <div class="cell-name">Amplification of Biases</div>
+                    <div class="cell-sub">Systemic inequities</div>
+                </td>
+                <td class="cell-tags">
+                    Filter bubbles · Biased training data<br>
+                    Bias in 3D object generation
+                </td>
+                <td>
+                    <div class="score-inner">
+                        <span class="score-num">—</span>
+                        <div class="bar-bg"><div class="bar-fill bar-orange" style="width:14%"></div></div>
+                    </div>
+                    <div class="score-pct">Multiple papers</div>
+                </td>
+            </tr>
+            <tr>
+                <td class="rk">6</td>
+                <td><div class="cat-icon ic-blue">📋</div></td>
+                <td>
+                    <div class="cell-name">Lack of Preparedness &amp; Standards</div>
+                    <div class="cell-sub">Regulatory &amp; ethical gaps</div>
+                </td>
+                <td class="cell-tags">
+                    No industry guidelines · Accessibility gaps<br>
+                    Insufficient safeguards for vulnerable groups
+                </td>
+                <td>
+                    <div class="score-inner">
+                        <span class="score-num">—</span>
+                        <div class="bar-bg"><div class="bar-fill bar-blue" style="width:10%"></div></div>
+                    </div>
+                    <div class="score-pct">Multiple papers</div>
+                </td>
+            </tr>
+            <tr>
+                <td class="rk">7</td>
+                <td><div class="cat-icon ic-green">⚙️</div></td>
+                <td>
+                    <div class="cell-name">Technical Limitations</div>
+                    <div class="cell-sub">Engineering constraints</div>
+                </td>
+                <td class="cell-tags">
+                    High compute requirements · Quality &amp; accuracy issues<br>
+                    Cross-platform compatibility challenges
+                </td>
+                <td>
+                    <div class="score-inner">
+                        <span class="score-num">—</span>
+                        <div class="bar-bg"><div class="bar-fill bar-green" style="width:7%"></div></div>
+                    </div>
+                    <div class="score-pct">Multiple papers</div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <p class="lb-foot">Risk prevalence based on co-occurrence analysis across all 135 papers.</p>
+</section>
+
+<!-- ── Literature database ────────────────────────────────────── -->
+<hr class="sep">
+<section id="literature" class="section">
+    <div class="sec-hdr">
+        <h2 class="sec-title">Literature Database</h2>
+    </div>
+    <p class="sec-meta">Explore the papers analyzed in this review · click any row to expand</p>
+    <hr class="sec-divider">
+
+    <div class="lit-controls">
+        <input type="text" id="litSearch" class="lit-search" placeholder="Search title, authors, capability…">
+        <select id="litXR"  class="lit-sel">
+            <option value="">All XR Types</option>
+            <option value="VR">VR</option>
+            <option value="AR">AR</option>
+            <option value="MR">MR</option>
+        </select>
+        <select id="litSP"  class="lit-sel">
+            <option value="">All Superpowers</option>
+            <option value="internal">Internal</option>
+            <option value="external">External</option>
+            <option value="readmind">Mind Reading</option>
+        </select>
+        <select id="litPop" class="lit-sel">
+            <option value="">All Populations</option>
+            <option value="general">General</option>
+            <option value="children">Children</option>
+            <option value="student">Students</option>
+        </select>
+        <button id="litReset" class="btn-rst">Reset</button>
+    </div>
+
+    <p class="lit-count">Showing <strong id="litCount">0</strong> papers</p>
+
+    <table class="lit-tbl" id="litTable">
+        <thead>
+            <tr>
+                <th style="width:2.4rem">#</th>
+                <th>Paper</th>
+                <th style="width:88px">XR Type</th>
+                <th style="width:130px">Superpower</th>
+                <th style="width:80px">Population</th>
+                <th style="width:22px"></th>
+            </tr>
+        </thead>
+        <tbody id="litBody"></tbody>
+    </table>
+</section>
+
+<!-- ── Insights ───────────────────────────────────────────────── -->
+<hr class="sep">
+<section id="insights" class="section">
+    <div class="sec-hdr">
+        <h2 class="sec-title">Key Insights</h2>
+    </div>
+    <p class="sec-meta">Core findings from the literature review</p>
+    <hr class="sec-divider">
+
+    <div class="insights-wrap">
+        <div class="ins-card">
+            <h3>Dual-Edged Nature</h3>
+            <p>Every superpower category comes with associated risks. The most powerful capabilities often present the greatest vulnerabilities, particularly in behavioral manipulation and data privacy.</p>
+        </div>
+        <div class="ins-card">
+            <h3>Dominant Concerns</h3>
+            <p>Manipulation of thoughts and behavior is the most prevalent risk, affecting <strong>100 papers (74%)</strong>, followed by user data awareness issues in <strong>60 papers (44%)</strong>.</p>
+        </div>
+        <div class="ins-card">
+            <h3>Application Domains</h3>
+            <p>LLM-enabled XR shows particular promise in healthcare, education, and professional training, where cognitive and sensory enhancements can significantly improve outcomes.</p>
+        </div>
+        <div class="ins-card">
+            <h3>Need for Standards</h3>
+            <p>The rapid evolution of these technologies has outpaced the development of ethical guidelines, industry standards, and safeguarding measures for vulnerable populations.</p>
+        </div>
+        <div class="ins-card">
+            <h3>Mind Reading Capabilities</h3>
+            <p>Multimodal behavioral signal interpretation (eye, body, voice) presents unique opportunities for enhanced social cognition but raises significant privacy concerns about pervasive data collection.</p>
+        </div>
+        <div class="ins-card">
+            <h3>Future Directions</h3>
+            <p>Design guidelines must balance innovation with user protection, emphasizing transparency, consent, and ethical deployment of AI-powered XR technologies.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ── Footer ─────────────────────────────────────────────────── -->
+<footer>
+    <div class="foot-inner">
+        <p class="foot-title">Stay in the loop</p>
+        <p class="foot-sub">
+            This review will be updated as new research emerges at the intersection of
+            large language models and extended reality technologies.
+        </p>
+        <p class="foot-copy">© 2026 LLM+XR Superpowers &amp; Risks Literature Review · CHI 2026</p>
+    </div>
+</footer>
+
+<!-- ── Scripts ────────────────────────────────────────────────── -->
+<script src="literature_data.js"></script>
+<script>
+(function () {
+    /* ── hero word rotation ─────────────────────────────── */
+    const words = ['LLM‑Enabled XR', 'Superpowers', 'Risks', 'Immersive AI'];
+    const gradients = [
+        'linear-gradient(130deg,#10b981 0%,#3b82f6 50%,#a855f7 100%)',
+        'linear-gradient(130deg,#10b981 0%,#34d399 100%)',
+        'linear-gradient(130deg,#ef4444 0%,#f59e0b 100%)',
+        'linear-gradient(130deg,#6366f1 0%,#a855f7 100%)',
+    ];
+    let wi = 0;
+    const el = document.getElementById('hero-word');
+    setInterval(() => {
+        wi = (wi + 1) % words.length;
+        el.style.opacity = '0';
+        el.style.transition = 'opacity .3s';
+        setTimeout(() => {
+            el.textContent = words[wi];
+            el.style.backgroundImage = gradients[wi];
+            el.style.opacity = '1';
+        }, 300);
+    }, 2800);
+
+    /* ── literature rendering ───────────────────────────── */
+    const body    = document.getElementById('litBody');
+    const countEl = document.getElementById('litCount');
+    const search  = document.getElementById('litSearch');
+    const selXR   = document.getElementById('litXR');
+    const selSP   = document.getElementById('litSP');
+    const selPop  = document.getElementById('litPop');
+    const btnRst  = document.getElementById('litReset');
+
+    function spBadge(cat) {
+        const parts = cat.split(',').map(s => s.trim());
+        return parts.map(p => {
+            if (p === 'internal')  return `<span class="bdg bdg-int">Internal</span>`;
+            if (p === 'external')  return `<span class="bdg bdg-ext">External</span>`;
+            if (p === 'readmind') return `<span class="bdg bdg-mnd">Mind Read</span>`;
+            return `<span class="bdg bdg-pop">${p}</span>`;
+        }).join(' ');
+    }
+
+    function xrBadges(xr) {
+        return xr.split(',').map(x =>
+            `<span class="bdg bdg-xr">${x.trim()}</span>`
+        ).join(' ');
+    }
+
+    function render() {
+        body.innerHTML = '';
+        const q   = search.value.toLowerCase();
+        const xr  = selXR.value.toLowerCase();
+        const sp  = selSP.value.toLowerCase();
+        const pop = selPop.value.toLowerCase();
+
+        let vis = 0;
+        literatureData.forEach((p, i) => {
+            const matchQ  = !q   || [p.title, p.authors, p.description, p.risks || ''].some(s => s.toLowerCase().includes(q));
+            const matchXR = !xr  || p.xrType.toLowerCase().includes(xr);
+            const matchSP = !sp  || p.superpowerCategory.toLowerCase().includes(sp);
+            const matchPp = !pop || p.population.toLowerCase() === pop;
+            const show = matchQ && matchXR && matchSP && matchPp;
+
+            if (show) vis++;
+
+            /* main row */
+            const tr = document.createElement('tr');
+            tr.className = 'paper-row' + (show ? '' : ' hidden');
+            tr.dataset.idx = i;
+            tr.innerHTML = `
+                <td style="color:var(--dim);font-size:.72rem">${i+1}</td>
+                <td>
+                    <div class="ptitle">${p.title}</div>
+                    <div class="pauth">${p.authors}</div>
+                </td>
+                <td>${xrBadges(p.xrType)}</td>
+                <td>${spBadge(p.superpowerCategory)}</td>
+                <td><span class="bdg bdg-pop">${p.population}</span></td>
+                <td><span class="chev">›</span></td>`;
+
+            /* expand row */
+            const ex = document.createElement('tr');
+            ex.className = 'expand-row';
+            ex.innerHTML = `<td colspan="6"><div class="expand-inner">
+                <div class="exp-grid">
+                    <div class="exp-field">
+                        <label>Capability</label>
+                        <p>${p.description || '—'}</p>
+                    </div>
+                    <div class="exp-field">
+                        <label>Superpower Codes</label>
+                        <p>${p.superpowerCodes || '—'}</p>
+                    </div>
+                    <div class="exp-field">
+                        <label>Associated Risks</label>
+                        <p>${p.risks || '—'}</p>
+                    </div>
+                    <div class="exp-field">
+                        <label>Risk Description</label>
+                        <p>${p.riskDescription || '—'}</p>
+                    </div>
+                </div>
+            </div></td>`;
+
+            tr.addEventListener('click', () => {
+                const open = ex.classList.toggle('open');
+                tr.querySelector('.chev').classList.toggle('open', open);
+            });
+
+            body.appendChild(tr);
+            body.appendChild(ex);
+        });
+
+        countEl.textContent = vis;
+    }
+
+    search.addEventListener('input', render);
+    selXR.addEventListener('change', render);
+    selSP.addEventListener('change', render);
+    selPop.addEventListener('change', render);
+    btnRst.addEventListener('click', () => {
+        search.value = '';
+        selXR.value = selSP.value = selPop.value = '';
+        render();
+    });
+
+    document.addEventListener('DOMContentLoaded', render);
+    if (document.readyState !== 'loading') render();
+})();
+</script>
+</body>
+</html>
